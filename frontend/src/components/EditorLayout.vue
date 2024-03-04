@@ -11,7 +11,6 @@
 <script>
 
 import MonacoEditor from "vue-monaco-editor";
-
 export default {
   name: "EditorLayout",
   components: {
