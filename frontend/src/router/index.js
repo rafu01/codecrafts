@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomePage from '../components/HomePage'
+import EditorLayout from "@/components/EditorLayout.vue";
 
 
 Vue.use(VueRouter)
@@ -11,6 +12,11 @@ const routes = [
     name: 'home',
     component: HomePage
   },
+  {
+    path: '/project',
+    name: 'layout',
+    component: EditorLayout
+  }
 ]
 
 const router = new VueRouter({

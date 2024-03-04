@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="body">
     <img alt="CodeCraft logo" class="logo" src="../assets/logo.png" />
     <label class="label" for="dropdown">Select Language:</label>
     <div class="select">
@@ -41,6 +41,10 @@ li {
 }
 a {
   color: #42b983;
+}
+
+.body {
+  text-align: center;
 }
 
 .logo {
