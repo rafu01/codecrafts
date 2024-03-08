@@ -6,6 +6,7 @@ export function initialize(app: Express) {
 
   app.post("/project", async (request, response) => {
     const { id, language } = request.body;
+    console.log(id, language);
     response.send("Workspace initialized");
   });
 }

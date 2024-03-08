@@ -10,12 +10,13 @@
         </option>
       </select>
       <br />
-      <button class="button is-dark">Let's Go!</button>
+      <button class="button is-dark" @click="handleClick">Let's Go!</button>
     </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
 export default {
   name: "HomePage",
   data() {
@@ -24,6 +25,27 @@ export default {
       selectedOption: null,
     };
   },
+  methods: {
+    handleClick() {
+      if (this.selectedOption) {
+        const id = "RANDOM";
+        const language = this.selectedOption;
+        this.onSubmit(id, language);
+      } else {
+        console.error("Please select a language.");
+      }
+    },
+    onSubmit(id, language) {
+      axios.post(`${process.env.VUE_APP_BACKEND}/project`, {id, language})
+          .then(response => {
+            console.log("Response from backend:", response);
+          })
+          .catch(error => {
+            console.error("Error:", error);
+          });
+
+    }
+  }
 };
 </script>
 

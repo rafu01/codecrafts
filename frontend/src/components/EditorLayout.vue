@@ -1,9 +1,13 @@
 <template>
   <div>
-    <MegaMenu class="topbar" :model="topbarItems" aria-orientation="horizontal"></MegaMenu>
+    <MegaMenu class="topbar" :model="topbarItems" aria-orientation="horizontal">
+      <template #item="{ item }">
+        <a :href="item.url">{{ item.label }}</a>
+      </template>
+    </MegaMenu>
     <div class="row">
       <div class="columns">
-        <div class="column is-2">
+    npm i    <div class="column is-2">
           <FileTree></FileTree>
         </div>
         <div class="column is-10">
@@ -50,10 +54,10 @@ export default {
       language: "python",
       topbarItems: [
         {
-          label: 'project title', icon: 'pi pi-fw pi-folder'
+          label: 'project title', icon: 'pi pi-fw pi-folder', url: '#'
         },
         {
-          label: 'Run', icon: 'pi pi-play'
+          label: 'Run', icon: 'pi pi-play', url: 'https://google.com'
         }
       ]
     };
