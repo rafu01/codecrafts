@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Tree :value="nodes" />
+    <Tree :value="nodes" :filter="true" filterMode="lenient"/>
   </div>
 </template>
 

@@ -1,17 +1,20 @@
 <template>
-  <div class="row">
-    <div class="columns">
-      <div class="column is-2">
-        <FileTree></FileTree>
-      </div>
-      <div class="column is-10">
-        <MonacoEditor height="600"
-                       :language="language"
-                       :code="code"
-                       @mounted="onMounted"
-                       @codeChange="onCodeChange"
-                       :changeThrottle="500">
-        </MonacoEditor>
+  <div>
+    <MegaMenu class="topbar" :model="topbarItems" aria-orientation="horizontal"></MegaMenu>
+    <div class="row">
+      <div class="columns">
+        <div class="column is-2">
+          <FileTree></FileTree>
+        </div>
+        <div class="column is-10">
+          <MonacoEditor height="645"
+                        :language="language"
+                        :code="code"
+                        @mounted="onMounted"
+                        @codeChange="onCodeChange"
+                        :changeThrottle="500">
+          </MonacoEditor>
+        </div>
       </div>
     </div>
   </div>
@@ -20,6 +23,7 @@
 <script>
 
 import MonacoEditor from "vue-monaco-editor";
+import MegaMenu from 'primevue/megamenu';
 import FileTree from "@/components/FileTree.vue";
 
 export default {
@@ -27,6 +31,7 @@ export default {
   components: {
     FileTree,
     MonacoEditor,
+    MegaMenu
   },
   methods: {
     onMounted(editor) {
@@ -34,12 +39,23 @@ export default {
     },
     onCodeChange() {
       console.log(this.editor.getValue());
+    },
+    handleItemClick(item) {
+      console.log('Clicked:', item);
     }
   },
   data() {
     return {
       code: "#start your code here",
       language: "python",
+      topbarItems: [
+        {
+          label: 'project title', icon: 'pi pi-fw pi-folder'
+        },
+        {
+          label: 'Run', icon: 'pi pi-play'
+        }
+      ]
     };
   },
 };
@@ -60,6 +76,10 @@ export default {
   }
 }
 
+.column {
+  padding: 0;
+}
+
 .number {
   all: unset
 }
@@ -70,6 +90,9 @@ export default {
   &:hover {
     cursor: pointer;
   }
+}
+.topbar {
+  padding: 0 0 10px 0;
 }
 .muted {
   color: gray;
