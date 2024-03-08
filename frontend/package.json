@@ -10,6 +10,8 @@
   "dependencies": {
     "bulma": "^0.9.4",
     "core-js": "^3.8.3",
+    "primeicons": "^6.0.1",
+    "primevue": "^2.10.4",
     "vue": "^2.6.14",
     "vue-monaco-editor": "^0.0.19",
     "vue-router": "^3.5.1"
