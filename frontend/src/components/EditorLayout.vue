@@ -7,7 +7,7 @@
     </MegaMenu>
     <div class="row">
       <div class="columns">
-    npm i    <div class="column is-2">
+        <div class="column is-2">
           <FileTree></FileTree>
         </div>
         <div class="column is-10">

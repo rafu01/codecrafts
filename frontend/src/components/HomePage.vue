@@ -17,20 +17,24 @@
 
 <script>
 import axios from 'axios';
+import {generateRandomPhrase} from "@/services/phrasesService.ts";
 export default {
   name: "HomePage",
   data() {
     return {
       options: ["Node Js", "Python"],
       selectedOption: null,
+      id: null
     };
+  },
+  mounted() {
+    this.id = generateRandomPhrase();
   },
   methods: {
     handleClick() {
       if (this.selectedOption) {
-        const id = "RANDOM";
         const language = this.selectedOption;
-        this.onSubmit(id, language);
+        this.onSubmit(this.id, language);
       } else {
         console.error("Please select a language.");
       }
