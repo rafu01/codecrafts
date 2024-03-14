@@ -17,7 +17,7 @@
 
 <script>
 import axios from 'axios';
-import {generateRandomPhrase} from "@/services/phrasesService.ts";
+import {generateRandomPhrase} from "@/services/phrasesService.js";
 export default {
   name: "HomePage",
   data() {
