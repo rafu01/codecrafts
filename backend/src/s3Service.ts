@@ -1,24 +1,21 @@
 import fs from "fs";
 import path from "path";
 import {S3Object} from "aws-sdk/clients/macie2";
+import * as dotenv from "dotenv";
+dotenv.config();
 
 const AWS = require('aws-sdk');
 
-// AWS.config.update({
-//     region: 'ap-south-1',
-//     accessKeyId: 'LSIAQAAAAAAVNCBMPNSG',
-//     // secretAccessKey: 'secret'
-// });
-
 const s3 = new AWS.S3({
+    accessKeyId: process.env.AWS_ACCESS_KEY,
+    secretAccessKey: process.env.AWS_SECRET_KEY,
     endpoint: process.env.AWS_ENDPOINT,
     s3ForcePathStyle: true,
-    signatureVersion: 'v4',
 });
+
 
 export async function copyS3Folder(sourcePrefix: string, destinationPrefix: string, continuationToken?: string): Promise<void> {
     try {
-        // List all objects in the source folder
         const listParams = {
             Bucket: process.env.AWS_S3_BUCKET ?? "",
             Prefix: sourcePrefix,
@@ -26,33 +23,50 @@ export async function copyS3Folder(sourcePrefix: string, destinationPrefix: stri
         };
 
         const listedObjects = await s3.listObjectsV2(listParams).promise();
-
         if (!listedObjects.Contents || listedObjects.Contents.length === 0) return;
-
-        // Copy each object to the new location
-        await Promise.all(listedObjects.Contents.map(async (object:S3Object) => {
-            if (!object.key) return;
-            let destinationKey = object.key.replace(sourcePrefix, destinationPrefix);
-            let copyParams = {
+        for (const object of listedObjects.Contents) {
+            if (!object.Key) continue;
+            const destinationKey = object.Key.replace(sourcePrefix, destinationPrefix);
+            const copyParams = {
                 Bucket: process.env.AWS_S3_BUCKET ?? "",
-                CopySource: `${process.env.AWS_S3_BUCKET}/${object.key}`,
+                CopySource: `${process.env.AWS_S3_BUCKET}/${object.Key}`,
                 Key: destinationKey
             };
-
-            console.log(copyParams);
-
-            await s3.copyObject(copyParams).promise();
-            console.log(`Copied ${object.key} to ${destinationKey}`);
-        }));
-
-        // Check if the list was truncated and continue copying if necessary
-        if (listedObjects.IsTruncated) {
-            listParams.ContinuationToken = listedObjects.NextContinuationToken;
-            await copyS3Folder(sourcePrefix, destinationPrefix, continuationToken);
+            try {
+                await s3.copyObject(copyParams).promise();
+                console.log(`Copied ${object.Key} to ${destinationKey}`);
+            } catch (error) {
+                console.error(`Error copying ${object.Key} to ${destinationKey}:`, error);
+            }
         }
     } catch (error) {
         console.error('Error copying folder:', error);
     }
+}
+
+function writeFile(filePath: string, fileData: Buffer): Promise<void> {
+    return new Promise(async (resolve, reject) => {
+        await createFolder(path.dirname(filePath));
+
+        fs.writeFile(filePath, fileData, (err) => {
+            if (err) {
+                reject(err)
+            } else {
+                resolve()
+            }
+        })
+    });
+}
+
+function createFolder(dirName: string) {
+    return new Promise<void>((resolve, reject) => {
+        fs.mkdir(dirName, {recursive: true}, (err) => {
+            if (err) {
+                return reject(err)
+            }
+            resolve()
+        });
+    })
 }
 
 export const getFolder = async (key: string, path: string) => {
@@ -85,31 +99,6 @@ export const getFolder = async (key: string, path: string) => {
     } catch (error) {
         console.log("Error fetching folder from S3");
     }
-}
-
-function writeFile(filePath: string, fileData: Buffer): Promise<void> {
-    return new Promise(async (resolve, reject) => {
-        await createFolder(path.dirname(filePath));
-
-        fs.writeFile(filePath, fileData, (err) => {
-            if (err) {
-                reject(err)
-            } else {
-                resolve()
-            }
-        })
-    });
-}
-
-function createFolder(dirName: string) {
-    return new Promise<void>((resolve, reject) => {
-        fs.mkdir(dirName, {recursive: true}, (err) => {
-            if (err) {
-                return reject(err)
-            }
-            resolve()
-        });
-    })
 }
 
 
