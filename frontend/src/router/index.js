@@ -12,7 +12,7 @@ const routes = [
     component: HomePage
   },
   {
-    path: '/project',
+    path: '/project/:id',
     name: 'layout',
     component: EditorLayout,
     props: true

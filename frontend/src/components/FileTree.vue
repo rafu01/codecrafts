@@ -1,6 +1,10 @@
 <template>
   <div>
-    <Tree :value="nodes" :filter="true" filterMode="lenient"/>
+    <Tree :value="nodes" :filter="true" filterMode="lenient" @node-click="handleNodeClick">
+    <template #default="slotProps">
+      <span>{{ slotProps.node.label }}</span>
+    </template>
+    </Tree>
   </div>
 </template>
 
@@ -26,6 +30,15 @@ export default {
     return {
       nodes: null
     };
+  },
+  methods: {
+    handleNodeClick(event) {
+      const node = event.node;
+      console.log("here");
+      if (node.icon === 'pi pi-fw pi-file') {
+        this.$emit('file-selected', node.data);
+      }
+    }
   }
 };
 </script>

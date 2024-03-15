@@ -8,7 +8,7 @@
     <div class="row">
       <div class="columns">
         <div class="column is-2">
-          <FileTree :file-tree="fileTree"></FileTree>
+          <FileTree :file-tree="fileTree" @file-selected="fetchFileContent"></FileTree>
         </div>
         <div class="column is-10">
           <MonacoEditor height="645"
@@ -29,7 +29,7 @@
 import MonacoEditor from "vue-monaco-editor";
 import MegaMenu from 'primevue/megamenu';
 import FileTree from "@/components/FileTree.vue";
-
+import socketMixin from '@/socket';
 export default {
   name: "EditorLayout",
   props: {
@@ -52,8 +52,14 @@ export default {
     },
     handleItemClick(item) {
       console.log('Clicked:', item);
+    },
+    fetchFileContent(filePath) {
+      this.$socket.emit('fetchFileContent', filePath, (fileContent) => {
+        this.code = fileContent;
+      });
     }
   },
+  mixins: [socketMixin],
   data() {
     return {
       code: "#start your code here",
