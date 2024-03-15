@@ -29,7 +29,7 @@
 import MonacoEditor from "vue-monaco-editor";
 import MegaMenu from 'primevue/megamenu';
 import FileTree from "@/components/FileTree.vue";
-import socketMixin from '@/socket';
+import Vue from "vue";
 export default {
   name: "EditorLayout",
   props: {
@@ -42,6 +42,11 @@ export default {
     FileTree,
     MonacoEditor,
     MegaMenu
+  },
+  mounted() {
+    const id = this.$route.query;
+    Vue.prototype.$socket.open();
+    this.$socket.emit('init', id);
   },
   methods: {
     onMounted(editor) {
@@ -59,7 +64,6 @@ export default {
       });
     }
   },
-  mixins: [socketMixin],
   data() {
     return {
       code: "#start your code here",

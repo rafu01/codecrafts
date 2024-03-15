@@ -13,7 +13,10 @@ export function initializeSocket(httpServer: HttpServer) {
 
   socket.on("connection", async (connection) => {
     const id = connection.handshake.query.id as string;
-    await getFolder(`code/${id}`, path.join(__dirname, `../../tmp/${id}`));
+    connection.on('init', async (idObject)=> {
+      const {id} = idObject;
+      await getFolder(`code/${id}`, path.join(__dirname, `../../tmp/${id}`));
+    })
     connection.on('fetchFileContent', (filePath, callback) => {
       console.log("asking for files completed");
     })

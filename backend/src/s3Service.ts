@@ -2,7 +2,8 @@ import fs from "fs";
 import path from "path";
 import {S3Object} from "aws-sdk/clients/macie2";
 import * as dotenv from "dotenv";
-import {TreeNode ,createTreeFromPaths} from "./treeNodeService";
+import {TreeNode, createTreeFromPaths} from "./treeNodeService";
+
 dotenv.config();
 
 const AWS = require('aws-sdk');
@@ -23,8 +24,9 @@ export async function copyS3Folder(sourcePrefix: string, destinationPrefix: stri
         };
 
         const listedObjects = await s3.listObjectsV2(listParams).promise();
-        if (!listedObjects.Contents || listedObjects.Contents.length === 0) {
 
+        if (!listedObjects.Contents || listedObjects.Contents.length === 0) {
+            console.log("base is empty");
         }
         let responseList: string[] = [];
         for (const object of listedObjects.Contents) {
@@ -49,6 +51,7 @@ export async function copyS3Folder(sourcePrefix: string, destinationPrefix: stri
         throw error;
     }
 }
+
 function writeFile(filePath: string, fileData: Buffer): Promise<void> {
     return new Promise(async (resolve, reject) => {
         await createFolder(path.dirname(filePath));
@@ -76,33 +79,25 @@ function createFolder(dirName: string) {
 
 export const getFolder = async (key: string, path: string) => {
     try {
-        let response = await s3.listObjectsV2({
+        let listedObjects = await s3.listObjectsV2({
             Bucket: process.env.AWS_S3_BUCKET,
             Prefix: key
         }).promise();
-        if (response.Contents) {
-            await Promise.all(response.Contents.map(async (file: S3Object) => {
-                if (file.key) {
-                    const fileKey = file.key;
-                    const getObjectParams = {
-                        Bucket: process.env.AWS_CODE_S3_BUCKET ?? "",
-                        Key: fileKey
-                    };
-                    const data = await s3.getObject(getObjectParams).promise();
-                    console.log(data);
-                    if (data.Body) {
-                        const fileData = data.Body;
-                        const filePath = `${path}/${fileKey.replace(key, "")}`;
-
-                        await writeFile(filePath, fileData);
-
-                        console.log(`Downloaded ${fileKey} to ${filePath}`);
-                    }
-                }
-            }));
+        for (const object of listedObjects.Contents) {
+            const getObjectParams = {
+                Bucket: process.env.AWS_S3_BUCKET ?? '',
+                Key: object.Key
+            }
+            const data = await s3.getObject(getObjectParams).promise();
+            if(data.Body) {
+                const fileData = data.Body;
+                const filePath = `${path}/${object.Key.replace(key, "")}`;
+                await writeFile(filePath, fileData);
+                console.log(`Download ${object.Key} to ${filePath}`);
+            }
         }
     } catch (error) {
-        console.log("Error fetching folder from S3");
+        console.log("Error fetching folder from S3", error);
     }
 }
 
