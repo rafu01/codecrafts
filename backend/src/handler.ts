@@ -1,6 +1,7 @@
 import { Express } from "express";
 import express from "express";
 import {copyS3Folder} from "./s3Service";
+import {initializeSocket} from "./socketConnection";
 
 export function initialize(app: Express) {
   app.use(express.json());
@@ -12,6 +13,7 @@ export function initialize(app: Express) {
       return;
     }
     const treeNodes = await copyS3Folder(`base/${language}`, `code/${id}`);
+
     response.send(treeNodes);
   });
 }

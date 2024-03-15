@@ -82,14 +82,14 @@ export const getFolder = async (key: string, path: string) => {
         }).promise();
         if (response.Contents) {
             await Promise.all(response.Contents.map(async (file: S3Object) => {
-                const fileKey = file.key;
-                if (fileKey) {
+                if (file.key) {
+                    const fileKey = file.key;
                     const getObjectParams = {
-                        Bucket: process.env.S3_BUCKET ?? "",
+                        Bucket: process.env.AWS_CODE_S3_BUCKET ?? "",
                         Key: fileKey
                     };
-
                     const data = await s3.getObject(getObjectParams).promise();
+                    console.log(data);
                     if (data.Body) {
                         const fileData = data.Body;
                         const filePath = `${path}/${fileKey.replace(key, "")}`;
