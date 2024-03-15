@@ -8,7 +8,7 @@
     <div class="row">
       <div class="columns">
         <div class="column is-2">
-          <FileTree></FileTree>
+          <FileTree :file-tree="fileTree"></FileTree>
         </div>
         <div class="column is-10">
           <MonacoEditor height="645"
@@ -32,6 +32,12 @@ import FileTree from "@/components/FileTree.vue";
 
 export default {
   name: "EditorLayout",
+  props: {
+    fileTree: {
+      type: Array,
+      required: true
+    }
+  },
   components: {
     FileTree,
     MonacoEditor,

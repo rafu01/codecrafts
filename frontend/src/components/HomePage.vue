@@ -18,6 +18,7 @@
 <script>
 import axios from 'axios';
 import {generateRandomPhrase} from "@/services/phrasesService.js";
+import router from '../router/index';
 export default {
   name: "HomePage",
   data() {
@@ -42,12 +43,14 @@ export default {
     onSubmit(id, language) {
       axios.post(`${process.env.VUE_APP_BACKEND}/project`, {id, language})
           .then(response => {
-            console.log("Response from backend:", response);
+            router.push({
+              name: 'layout',
+              params: {fileTree: response.data}
+            })
           })
           .catch(error => {
             console.error("Error:", error);
           });
-
     }
   }
 };

@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import {S3Object} from "aws-sdk/clients/macie2";
 import * as dotenv from "dotenv";
+import {TreeNode ,createTreeFromPaths} from "./treeNodeService";
 dotenv.config();
 
 const AWS = require('aws-sdk');
@@ -14,16 +15,18 @@ const s3 = new AWS.S3({
 });
 
 
-export async function copyS3Folder(sourcePrefix: string, destinationPrefix: string, continuationToken?: string): Promise<void> {
+export async function copyS3Folder(sourcePrefix: string, destinationPrefix: string): Promise<TreeNode[]> {
     try {
         const listParams = {
             Bucket: process.env.AWS_S3_BUCKET ?? "",
             Prefix: sourcePrefix,
-            ContinuationToken: continuationToken
         };
 
         const listedObjects = await s3.listObjectsV2(listParams).promise();
-        if (!listedObjects.Contents || listedObjects.Contents.length === 0) return;
+        if (!listedObjects.Contents || listedObjects.Contents.length === 0) {
+
+        }
+        let responseList: string[] = [];
         for (const object of listedObjects.Contents) {
             if (!object.Key) continue;
             const destinationKey = object.Key.replace(sourcePrefix, destinationPrefix);
@@ -35,15 +38,17 @@ export async function copyS3Folder(sourcePrefix: string, destinationPrefix: stri
             try {
                 await s3.copyObject(copyParams).promise();
                 console.log(`Copied ${object.Key} to ${destinationKey}`);
+                responseList.push(destinationKey);
             } catch (error) {
                 console.error(`Error copying ${object.Key} to ${destinationKey}:`, error);
             }
         }
+        return createTreeFromPaths(responseList);
     } catch (error) {
         console.error('Error copying folder:', error);
+        throw error;
     }
 }
-
 function writeFile(filePath: string, fileData: Buffer): Promise<void> {
     return new Promise(async (resolve, reject) => {
         await createFolder(path.dirname(filePath));
@@ -100,7 +105,5 @@ export const getFolder = async (key: string, path: string) => {
         console.log("Error fetching folder from S3");
     }
 }
-
-
 
 

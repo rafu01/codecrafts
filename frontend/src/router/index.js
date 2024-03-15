@@ -3,7 +3,6 @@ import VueRouter from 'vue-router'
 import HomePage from '../components/HomePage'
 import EditorLayout from "@/components/EditorLayout.vue";
 
-
 Vue.use(VueRouter)
 
 const routes = [
@@ -15,13 +14,13 @@ const routes = [
   {
     path: '/project',
     name: 'layout',
-    component: EditorLayout
+    component: EditorLayout,
+    props: true
   }
 ]
 
 const router = new VueRouter({
   mode: 'history',
-  base: process.env.BASE_URL,
   routes
 })
 
