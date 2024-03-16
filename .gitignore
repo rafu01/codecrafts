@@ -2,4 +2,4 @@ package-lock.json
 .idea/
 .samplecodes/
 .run/
-.tmp/
+tmp/*

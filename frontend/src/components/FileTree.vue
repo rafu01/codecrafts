@@ -1,9 +1,9 @@
 <template>
   <div>
-    <Tree :value="nodes" :filter="true" filterMode="lenient" @node-click="handleNodeClick">
-    <template #default="slotProps">
-      <span>{{ slotProps.node.label }}</span>
-    </template>
+    <Tree selectionMode="single" :value="nodes" :filter="true" filterMode="lenient" @node-select="handleNodeClick">
+      <template #node="{ node }">
+        <span>{{ node.label }}</span>
+      </template>
     </Tree>
   </div>
 </template>
@@ -23,20 +23,19 @@ export default {
     Tree,
   },
   mounted() {
-    console.log('data received', this.fileTree);
     this.nodes = this.fileTree;
   },
   data() {
     return {
-      nodes: null
+      nodes: null,
+      selectedNodeKey: null,
     };
   },
   methods: {
     handleNodeClick(event) {
-      const node = event.node;
-      console.log("here");
-      if (node.icon === 'pi pi-fw pi-file') {
-        this.$emit('file-selected', node.data);
+      this.selectedNodeKey = event.key;
+      if (this.selectedNodeKey.slice(-1) !== '/') {
+        this.$emit('file-selected', this.selectedNodeKey);
       }
     }
   }

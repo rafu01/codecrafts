@@ -13,17 +13,17 @@ export function createTreeFromPaths(paths: string[]): TreeNode[] {
         const parts = path.split('/');
         let currentNode: TreeNode | null = null;
         let parentNode: TreeNode | null = null;
-
+        let currentPath = '';
         for (let i = 0; i < parts.length; i++) {
             const part = parts[i];
-            const key = `${i > 0 ? parentNode?.key + '-' : ''}${i}`;
+            currentPath += part + (i < parts.length - 1 ? '/' : '');
             const icon =
                 i === parts.length - 1
                     ? 'pi pi-fw pi-file'
                     : 'pi pi-fw pi-folder';
 
             const node: TreeNode = {
-                key,
+                key: currentPath,
                 label: part,
                 data: part,
                 icon,

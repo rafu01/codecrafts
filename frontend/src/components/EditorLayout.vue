@@ -55,12 +55,11 @@ export default {
     onCodeChange() {
       console.log(this.editor.getValue());
     },
-    handleItemClick(item) {
-      console.log('Clicked:', item);
-    },
     fetchFileContent(filePath) {
-      this.$socket.emit('fetchFileContent', filePath, (fileContent) => {
-        this.code = fileContent;
+      this.$socket.emit('fetchFileContent', filePath, (err, fileContent) => {
+        if(err==null) {
+          this.editor.setValue(fileContent);
+        }
       });
     }
   },

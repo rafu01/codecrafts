@@ -101,4 +101,16 @@ export const getFolder = async (key: string, path: string) => {
     }
 }
 
+export const getFileContents = async (filePath: string): Promise<string> => {
+    return new Promise<string>((resolve, reject) => {
+        let codeFolderLength = `${process.env.CODE_FOLDER}`.length;
+        fs.readFile(path.join(__dirname, `../../tmp/${filePath.substring(codeFolderLength)}`), 'utf-8',  (err, data) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(data);
+            }
+        });
+    })
+}
 

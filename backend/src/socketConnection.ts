@@ -1,8 +1,9 @@
 import { Server as SocketServer, Socket } from "socket.io";
 import { Server as HttpServer } from "http";
-import {getFolder} from "./s3Service";
+import {getFileContents, getFolder} from "./s3Service";
 import path from "path";
-
+import * as dotenv from "dotenv";
+dotenv.config();
 export function initializeSocket(httpServer: HttpServer) {
   const socket = new SocketServer(httpServer, {
     cors: {
@@ -17,8 +18,14 @@ export function initializeSocket(httpServer: HttpServer) {
       const {id} = idObject;
       await getFolder(`code/${id}`, path.join(__dirname, `../../tmp/${id}`));
     })
-    connection.on('fetchFileContent', (filePath, callback) => {
-      console.log("asking for files completed");
+    connection.on('fetchFileContent', async (filePath, callback) => {
+      try {
+        let fileContent = await getFileContents(filePath);
+        callback(null, fileContent);
+      }
+      catch (err) {
+        callback(err);
+      }
     })
   });
 }
