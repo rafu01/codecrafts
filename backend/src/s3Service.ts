@@ -80,9 +80,24 @@ export function writeToFile(filePath: string, fileData: string):Promise<void> {
                 resolve()
             }
         })
+        await uploadToS3(filePath, fileData);
     });
 }
 
+async function uploadToS3(filePath: string, fileData: string) {
+    const putObjectParams = {
+        Bucket: process.env.AWS_S3_BUCKET ?? "",
+        Key: filePath,
+        Body: fileData,
+        ContentType: 'text/plain'
+    }
+    try {
+       await s3.putObject(putObjectParams).promise();
+    }
+    catch (err) {
+        console.log("error uploading file", err);
+    }
+}
 function createFolder(dirName: string) {
     return new Promise<void>((resolve, reject) => {
         fs.mkdir(dirName, {recursive: true}, (err) => {
