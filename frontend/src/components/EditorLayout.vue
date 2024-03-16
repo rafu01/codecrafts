@@ -16,7 +16,7 @@
                         :code="code"
                         @mounted="onMounted"
                         @codeChange="onCodeChange"
-                        :changeThrottle="500">
+                        :changeThrottle="2000">
           </MonacoEditor>
         </div>
       </div>
@@ -53,12 +53,15 @@ export default {
       this.editor = editor;
     },
     onCodeChange() {
-      console.log(this.editor.getValue());
+      this.$socket.emit('saveChange', this.editor.getValue(), this.selectedFilePath, (err, saved) => {
+        console.log('changes ', saved);
+      });
     },
     fetchFileContent(filePath) {
       this.$socket.emit('fetchFileContent', filePath, (err, fileContent) => {
         if(err==null) {
           this.editor.setValue(fileContent);
+          this.selectedFilePath = filePath
         }
       });
     }
@@ -67,6 +70,7 @@ export default {
     return {
       code: "#start your code here",
       language: "python",
+      selectedFilePath: null,
       topbarItems: [
         {
           label: 'project title', icon: 'pi pi-fw pi-folder', url: '#'

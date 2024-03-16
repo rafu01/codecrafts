@@ -66,6 +66,23 @@ function writeFile(filePath: string, fileData: Buffer): Promise<void> {
     });
 }
 
+function getPath(filePath: string, codeFolderLength: number) {
+    return path.join(__dirname, `../../tmp/${filePath.substring(codeFolderLength)}`);
+}
+
+export function writeToFile(filePath: string, fileData: string):Promise<void> {
+    return new Promise(async (resolve, reject) => {
+        let codeFolderLength = `${process.env.CODE_FOLDER}`.length;
+        fs.writeFile(getPath(filePath, codeFolderLength), fileData, (err) => {
+            if (err) {
+                reject(err)
+            } else {
+                resolve()
+            }
+        })
+    });
+}
+
 function createFolder(dirName: string) {
     return new Promise<void>((resolve, reject) => {
         fs.mkdir(dirName, {recursive: true}, (err) => {
@@ -104,7 +121,7 @@ export const getFolder = async (key: string, path: string) => {
 export const getFileContents = async (filePath: string): Promise<string> => {
     return new Promise<string>((resolve, reject) => {
         let codeFolderLength = `${process.env.CODE_FOLDER}`.length;
-        fs.readFile(path.join(__dirname, `../../tmp/${filePath.substring(codeFolderLength)}`), 'utf-8',  (err, data) => {
+        fs.readFile(getPath(filePath, codeFolderLength), 'utf-8',  (err, data) => {
             if (err) {
                 reject(err);
             } else {

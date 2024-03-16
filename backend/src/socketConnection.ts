@@ -1,6 +1,6 @@
 import { Server as SocketServer, Socket } from "socket.io";
 import { Server as HttpServer } from "http";
-import {getFileContents, getFolder} from "./s3Service";
+import {getFileContents, getFolder, writeToFile} from "./s3Service";
 import path from "path";
 import * as dotenv from "dotenv";
 dotenv.config();
@@ -22,6 +22,16 @@ export function initializeSocket(httpServer: HttpServer) {
       try {
         let fileContent = await getFileContents(filePath);
         callback(null, fileContent);
+      }
+      catch (err) {
+        callback(err);
+      }
+    })
+    connection.on('saveChange', async (updatedFile, filePath, callback) => {
+      try {
+        console.log(filePath);
+        await writeToFile(filePath, updatedFile);
+        callback(null, true);
       }
       catch (err) {
         callback(err);
