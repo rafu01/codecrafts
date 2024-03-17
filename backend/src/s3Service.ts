@@ -1,8 +1,7 @@
 import fs from "fs";
 import path from "path";
-import {S3Object} from "aws-sdk/clients/macie2";
 import * as dotenv from "dotenv";
-import {TreeNode, createTreeFromPaths} from "./treeNodeService";
+import {createTreeFromPaths, TreeNode} from "./treeNodeService";
 
 dotenv.config();
 
@@ -16,14 +15,18 @@ const s3 = new AWS.S3({
 });
 
 
+export async function fetchObjects(sourcePrefix: string) {
+    const listParams = {
+        Bucket: process.env.AWS_S3_BUCKET ?? "",
+        Prefix: sourcePrefix,
+    };
+
+    return await s3.listObjectsV2(listParams).promise();
+}
+
 export async function copyS3Folder(sourcePrefix: string, destinationPrefix: string): Promise<TreeNode[]> {
     try {
-        const listParams = {
-            Bucket: process.env.AWS_S3_BUCKET ?? "",
-            Prefix: sourcePrefix,
-        };
-
-        const listedObjects = await s3.listObjectsV2(listParams).promise();
+        const listedObjects = await fetchObjects(sourcePrefix);
 
         if (!listedObjects.Contents || listedObjects.Contents.length === 0) {
             console.log("base is empty");
@@ -109,7 +112,7 @@ function createFolder(dirName: string) {
     })
 }
 
-export const getFolder = async (key: string, path: string) => {
+export const copyToLocal = async (key: string, path: string) => {
     try {
         let listedObjects = await s3.listObjectsV2({
             Bucket: process.env.AWS_S3_BUCKET,
@@ -144,5 +147,19 @@ export const getFileContents = async (filePath: string): Promise<string> => {
             }
         });
     })
+}
+
+export const checkIfIdExists = async (id: string): Promise<boolean> => {
+    try {
+        const headObjectParams = {
+            Bucket: process.env.AWS_S3_BUCKET ?? "",
+            Key: `${process.env.CODE_FOLDER}${id}`,
+        };
+        await s3.headObject(headObjectParams).promise();
+        return true;
+    }
+    catch (err) {
+        return false;
+    }
 }
 

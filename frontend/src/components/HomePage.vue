@@ -45,8 +45,8 @@ export default {
           .then(response => {
             router.push({
               name: 'layout',
-              params: {fileTree: response.data},
-              query: { id: id }
+              params: {fileTree: response.data, id},
+              query: { id }
             })
           })
           .catch(error => {
