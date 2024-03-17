@@ -16,7 +16,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 import {generateRandomPhrase} from "@/services/phrasesService.js";
 import router from '../router/index';
 export default {
@@ -41,17 +40,11 @@ export default {
       }
     },
     onSubmit(id, language) {
-      axios.post(`${process.env.VUE_APP_BACKEND}/project`, {id, language})
-          .then(response => {
-            router.push({
-              name: 'layout',
-              params: {fileTree: response.data, id},
-              query: { id }
-            })
-          })
-          .catch(error => {
-            console.error("Error:", error);
-          });
+      router.push({
+        name: 'layout',
+        params: { id },
+        query: { id, language }
+      });
     }
   }
 };

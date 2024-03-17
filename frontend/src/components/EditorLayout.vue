@@ -7,7 +7,7 @@
     </MegaMenu>
     <div class="row">
       <div class="columns">
-        <div class="column is-2">
+        <div v-if="fileTree" class="column is-2">
           <FileTree :file-tree="fileTree" @file-selected="fetchFileContent"></FileTree>
         </div>
         <div class="column is-10">
@@ -30,18 +30,26 @@ import MonacoEditor from "vue-monaco-editor";
 import MegaMenu from 'primevue/megamenu';
 import FileTree from "@/components/FileTree.vue";
 import Vue from "vue";
+import axios from "axios";
+
 export default {
   name: "EditorLayout",
-  props: {
-    fileTree: {
-      type: Array,
-      required: true
-    }
-  },
   components: {
     FileTree,
     MonacoEditor,
     MegaMenu
+  },
+  beforeMount() {
+    const id = this.$route.query.id;
+    const language = this.$route.query.language;
+    console.log("this: ", id, language);
+    axios.post(`${process.env.VUE_APP_BACKEND}/project`, {id, language})
+        .then(response => {
+          this.fileTree = response.data;
+        })
+        .catch(error => {
+          console.error("Error:", error);
+        });
   },
   mounted() {
     const id = this.$route.query;
@@ -71,6 +79,7 @@ export default {
       code: "#start your code here",
       language: "python",
       selectedFilePath: null,
+      fileTree: null,
       topbarItems: [
         {
           label: 'project title', icon: 'pi pi-fw pi-folder', url: '#'

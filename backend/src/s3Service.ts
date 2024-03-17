@@ -14,8 +14,15 @@ const s3 = new AWS.S3({
     s3ForcePathStyle: true,
 });
 
-
-export async function fetchObjects(sourcePrefix: string) {
+export async function fetchAllObjects(sourcePrefix: string) {
+    const listedObjects = await fetchObjects(sourcePrefix);
+    let responseList: string[] = [];
+    for( const object of listedObjects.Contents) {
+        responseList.push(object.Key);
+    }
+    return createTreeFromPaths(responseList);
+}
+async function fetchObjects(sourcePrefix: string) {
     const listParams = {
         Bucket: process.env.AWS_S3_BUCKET ?? "",
         Prefix: sourcePrefix,
@@ -153,12 +160,13 @@ export const checkIfIdExists = async (id: string): Promise<boolean> => {
     try {
         const headObjectParams = {
             Bucket: process.env.AWS_S3_BUCKET ?? "",
-            Key: `${process.env.CODE_FOLDER}${id}`,
+            Prefix: `${process.env.CODE_FOLDER}${id}`,
         };
-        await s3.headObject(headObjectParams).promise();
-        return true;
+        let listObjects = await s3.listObjectsV2(headObjectParams).promise();
+        return listObjects.Contents.length > 0;
     }
     catch (err) {
+        console.log(err);
         return false;
     }
 }

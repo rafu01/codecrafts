@@ -29,7 +29,6 @@ export function initializeSocket(httpServer: HttpServer) {
     })
     connection.on('saveChange', async (updatedFile, filePath, callback) => {
       try {
-        console.log(filePath);
         await writeToFile(filePath, updatedFile);
         callback(null, true);
       }
