@@ -1,0 +1,2 @@
+ aws s3api create-bucket --bucket coderepository --region ap-south-2 --create-bucket-configuration LocationConstraint=ap-south-2 --endpoint-url=http://localhost:4566
+ aws s3 cp --recursive ./samplecodes/ s3://coderepository/base/ --endpoint-url=http://localhost:4566
