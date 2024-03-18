@@ -10,7 +10,7 @@
         <div v-if="fileTree" class="column is-2">
           <FileTree :file-tree="fileTree" @file-selected="fetchFileContent"></FileTree>
         </div>
-        <div class="column is-10">
+        <div class="column is-8">
           <MonacoEditor height="645"
                         :language="language"
                         :code="code"
@@ -18,6 +18,9 @@
                         @codeChange="onCodeChange"
                         :changeThrottle="2000">
           </MonacoEditor>
+        </div>
+        <div class="column is-2">
+          <TerminalComponent></TerminalComponent>
         </div>
       </div>
     </div>
@@ -31,10 +34,12 @@ import MegaMenu from 'primevue/megamenu';
 import FileTree from "@/components/FileTree.vue";
 import Vue from "vue";
 import axios from "axios";
+import TerminalComponent from "@/components/TerminalCore.vue";
 
 export default {
   name: "EditorLayout",
   components: {
+    TerminalComponent,
     FileTree,
     MonacoEditor,
     MegaMenu
