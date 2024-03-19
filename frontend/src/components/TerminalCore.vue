@@ -1,61 +1,71 @@
 <template>
-  <div>
-    <div id="terminal"></div>
-  </div>
+  <div ref="terminalContainer" style="width: 40vw; height: 400px; text-align: left;"></div>
 </template>
 
 <script>
 import { Terminal } from 'xterm';
-import 'xterm/css/xterm.css';
+import { FitAddon } from 'xterm-addon-fit';
+
+const fitAddon = new FitAddon();
+
+function ab2str(buf) {
+  return String.fromCharCode.apply(null, new Uint8Array(buf));
+}
+
+const OPTIONS_TERM = {
+  useStyle: true,
+  screenKeys: true,
+  cursorBlink: true,
+  cols: 200,
+  theme: {
+    background: 'black',
+  },
+};
 
 export default {
   name: 'TerminalComponent',
+  data() {
+    return {
+      term: null,
+    };
+  },
   mounted() {
     this.initTerminal();
   },
+  // beforeUnmount() {
+  //   this.$socket.off('terminal');
+  // },
   methods: {
     initTerminal() {
-      this.term = new Terminal();
-      this.term.open(document.getElementById('terminal'));
-      this.term.write('Welcome to the terminal!\r\n');
+      // if (!this.$refs.terminalContainer || !this.$socket) {
+      //   return;
+      // }
+
+      this.$socket.emit('requestTerminal');
+      this.$socket.on('terminal', this.terminalHandler);
+
+      this.term = new Terminal(OPTIONS_TERM);
+      this.term.loadAddon(fitAddon);
+      this.term.open(this.$refs.terminalContainer);
+      fitAddon.fit();
 
       this.term.onData((data) => {
-        this.handleUserInput(data);
+        console.log(data);
+        this.$socket.emit('terminalData', {
+          data,
+        });
+      });
+
+      this.$socket.emit('terminalData', {
+        data: '\n',
       });
     },
-    handleUserInput(data) {
-      const key = data.toString();
-
-      if (key === '\r') { // Enter key
-        this.processInput(this.inputBuffer);
-        this.inputBuffer = '';
-      } else if (key === '\u007f') { // Backspace key
-        this.inputBuffer = this.inputBuffer.slice(0, -1);
-        this.term.write('\b \b'); // Move the cursor back and overwrite the last character
-      } else if (key.match(/^[\x20-\x7e]*$/)) { // Printable characters
-        this.inputBuffer += key;
-        this.term.write(key);
+    terminalHandler({ data }) {
+      if (data instanceof ArrayBuffer) {
+        console.error(data);
+        console.log(ab2str(data));
+        this.term.write(ab2str(data));
       }
-    },
-    processInput(input) {
-      const trimmedInput = input.trim();
-
-      switch (trimmedInput) {
-        case 'clear':
-          this.term.clear();
-          break;
-        case 'help':
-          this.term.write('Available commands: clear, help, delete\r\n');
-          break;
-        case 'delete':
-          this.term.clear();
-          this.term.write('Terminal cleared.\r\n');
-          break;
-        default:
-          this.term.write(`Unknown command: ${trimmedInput}\r\n`);
-      }
-
-      this.term.write('\r\n'); // Move to a new line
     },
   },
 };

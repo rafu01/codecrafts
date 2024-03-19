@@ -3,7 +3,11 @@ import { Server as HttpServer } from "http";
 import {getFileContents, copyToLocal, writeToFile} from "./s3Service";
 import path from "path";
 import * as dotenv from "dotenv";
+import {TerminalManager} from "./terminalManager";
 dotenv.config();
+
+const terminalManager = new TerminalManager();
+
 export function initializeSocket(httpServer: HttpServer) {
   const socket = new SocketServer(httpServer, {
     cors: {
@@ -36,5 +40,16 @@ export function initializeSocket(httpServer: HttpServer) {
         callback(err);
       }
     })
+    connection.on("requestTerminal", async () => {
+      terminalManager.createPty(connection.id, id, (data, id) => {
+        socket.emit('terminal', {
+          data: Buffer.from(data,"utf-8")
+        });
+      });
+    });
+
+    connection.on("terminalData", async ({ data }: { data: string, terminalId: number }) => {
+      terminalManager.write(connection.id, data);
+    });
   });
 }
