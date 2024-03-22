@@ -1,0 +1,19 @@
+/*.xterm {*/
+/*    font-family: 'Courier New', Courier, monospace;*/
+/*    font-size: 14px;*/
+/*    line-height: 1.2;*/
+/*}*/
+
+/*.xterm-viewport {*/
+/*    overflow: hidden !important;*/
+/*}*/
+
+/*!*.xterm-helper-textarea {*!*/
+/*!*    opacity: 0;*!*/
+/*!*    position: absolute;*!*/
+/*!*    z-index: -1;*!*/
+/*!*}*!*/
+
+/*.xterm-char-measure-element {*/
+/*    display: none;*/
+/*}*/

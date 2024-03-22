@@ -4,25 +4,25 @@ import {getFileContents, copyToLocal, writeToFile} from "./s3Service";
 import path from "path";
 import * as dotenv from "dotenv";
 import {TerminalManager} from "./terminalManager";
+import {initTerminal} from "./terminalService";
 dotenv.config();
 
 const terminalManager = new TerminalManager();
 
 export function initializeSocket(httpServer: HttpServer) {
-  const socket = new SocketServer(httpServer, {
+  const io = new SocketServer(httpServer, {
     cors: {
       origin: '*',
       methods: ['GET', 'POST']
     }
   });
-
-  socket.on("connection", async (connection) => {
-    const id = connection.handshake.query.id as string;
-    connection.on('init', async (idObject)=> {
+  io.on("connection", async (socket) => {
+    const id = socket.handshake.query.id as string;
+    socket.on('init', async (idObject)=> {
       const {id} = idObject;
       await copyToLocal(`code/${id}`, path.join(__dirname, `../../tmp/${id}`));
     })
-    connection.on('fetchFileContent', async (filePath, callback) => {
+    socket.on('fetchFileContent', async (filePath, callback) => {
       try {
         let fileContent = await getFileContents(filePath);
         callback(null, fileContent);
@@ -31,7 +31,7 @@ export function initializeSocket(httpServer: HttpServer) {
         callback(err);
       }
     })
-    connection.on('saveChange', async (updatedFile, filePath, callback) => {
+    socket.on('saveChange', async (updatedFile, filePath, callback) => {
       try {
         await writeToFile(filePath, updatedFile);
         callback(null, true);
@@ -40,16 +40,19 @@ export function initializeSocket(httpServer: HttpServer) {
         callback(err);
       }
     })
-    connection.on("requestTerminal", async () => {
-      terminalManager.createPty(connection.id, id, (data, id) => {
-        socket.emit('terminal', {
-          data: Buffer.from(data,"utf-8")
-        });
+    socket.on("requestTerminal", async (idObject, callback) => {
+      const {id} = idObject;
+      terminalManager.createPty(socket.id, id, (data, cwd, terminalId) => {
+        callback(null, {data: Buffer.from(data,"utf-8"), cwd});
       });
     });
 
-    connection.on("terminalData", async ({ data }: { data: string, terminalId: number }) => {
-      terminalManager.write(connection.id, data);
+    socket.on('disconnect', () => {
+      console.log('a user disconnected');
+    });
+
+    socket.on("terminalData", async ({ data }: { data: string, terminalId: number }) => {
+      terminalManager.write(socket.id, data);
     });
   });
 }

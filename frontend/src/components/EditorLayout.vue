@@ -47,7 +47,6 @@ export default {
   beforeMount() {
     const id = this.$route.query.id;
     const language = this.$route.query.language;
-    console.log("this: ", id, language);
     axios.post(`${process.env.VUE_APP_BACKEND}/project`, {id, language})
         .then(response => {
           this.fileTree = response.data;
@@ -85,6 +84,7 @@ export default {
       language: "python",
       selectedFilePath: null,
       fileTree: null,
+      socket: null,
       topbarItems: [
         {
           label: 'project title', icon: 'pi pi-fw pi-folder', url: '#'

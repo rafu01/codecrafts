@@ -11,17 +11,18 @@ export class TerminalManager {
         this.sessions = {};
     }
 
-    createPty(id: string, repoId: string, onData: (data: string, id: number) => void) {
+    createPty(id: string, filePath: string, onData: (data: string, cwd:string, id: number) => void) {
+        const cwd = path.join(__dirname, `../../tmp/${filePath}`);
         let term = fork(SHELL, [], {
             cols: 100,
             name: 'xterm',
-            cwd: path.join(__dirname, `../tmp/${repoId}`)
+            cwd: cwd
         });
 
-        term.on('data', (data: string) => onData(data, term.pid));
+        term.on('data', (data: string) => onData(data, cwd, term.pid));
         this.sessions[id] = {
             terminal: term,
-            replId: repoId
+            replId: filePath
         };
         term.on('exit', () => {
             delete this.sessions[term.pid];
