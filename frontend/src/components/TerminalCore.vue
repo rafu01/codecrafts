@@ -15,7 +15,7 @@
 <script>
 import { Terminal } from 'xterm';
 import 'xterm/css/xterm.css';
-
+import '../assets/xterm-custom.css';
 export default {
   name: 'TerminalComponent',
   data() {
@@ -75,57 +75,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.terminal-container {
-  background-color: #282c34;
-  color: #abb2bf;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-  position: relative;
-}
-
-.terminal-header {
-  display: flex;
-  align-items: center;
-  padding: 8px;
-  background-color: #21252b;
-}
-
-.terminal-buttons {
-  display: flex;
-  margin-right: 8px;
-}
-
-.terminal-button {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  margin-right: 4px;
-}
-
-.terminal-button:nth-child(1) {
-  background-color: #ff5f57;
-}
-
-.terminal-button:nth-child(2) {
-  background-color: #febc2e;
-}
-
-.terminal-button:nth-child(3) {
-  background-color: #28c840;
-}
-
-.terminal-title {
-  font-size: 14px;
-  font-weight: bold;
-}
-
-.terminal-view {
-  padding: 8px;
-  height: 610px;
-  overflow: auto;
-}
-</style>
