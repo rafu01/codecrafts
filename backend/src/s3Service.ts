@@ -133,7 +133,7 @@ export const copyToLocal = async (key: string, path: string) => {
             const data = await s3.getObject(getObjectParams).promise();
             if(data.Body) {
                 const fileData = data.Body;
-                const filePath = `${path}/${object.Key.replace(key, "")}`;
+                const filePath = `${path}${object.Key.replace(key, "")}`;
                 await writeFile(filePath, fileData);
                 console.log(`Download ${object.Key} to ${filePath}`);
             }
