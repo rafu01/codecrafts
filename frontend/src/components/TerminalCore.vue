@@ -1,11 +1,11 @@
 <template>
   <div class="terminal-container">
     <div class="terminal-header">
-      <div class="terminal-buttons">
-        <span class="terminal-button"></span>
-        <span class="terminal-button"></span>
-        <span class="terminal-button"></span>
-      </div>
+<!--      <div class="terminal-buttons">-->
+<!--        <span class="terminal-button"></span>-->
+<!--        <span class="terminal-button"></span>-->
+<!--        <span class="terminal-button"></span>-->
+<!--      </div>-->
       <div class="terminal-title">Terminal</div>
     </div>
     <div ref="terminalContainer" class="terminal-view"></div>
