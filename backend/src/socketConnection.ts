@@ -3,8 +3,9 @@ import { Server as HttpServer } from "http";
 import {getFileContents, copyToLocal, writeToFile} from "./s3Service";
 import path from "path";
 import * as dotenv from "dotenv";
+// @ts-ignore
 import {TerminalManager} from "./terminalManager";
-import {initTerminal} from "./terminalService";
+import {initiate, runCommand} from "./terminalService";
 dotenv.config();
 
 const terminalManager = new TerminalManager();
@@ -42,17 +43,21 @@ export function initializeSocket(httpServer: HttpServer) {
     })
     socket.on("requestTerminal", async (idObject, callback) => {
       const {id} = idObject;
-      terminalManager.createPty(socket.id, id, (data, cwd, terminalId) => {
-        callback(null, {data: Buffer.from(data,"utf-8"), cwd});
-      });
+      const {output, cwd} = await initiate(id);
+      callback(null, {data: output, cwd});
+      // terminalManager.createPty(socket.id, id, (data: any, cwd: string, terminalId: any) => {
+      //   callback(null, {data: Buffer.from(data,"utf-8"), cwd});
+      // });
     });
 
     socket.on('disconnect', () => {
       console.log('a user disconnected');
     });
 
-    socket.on("terminalData", async ({ data }: { data: string, terminalId: number }) => {
-      terminalManager.write(socket.id, data);
+    socket.on("executeCommand", async (command, callback) => {
+      console.log('command: ', command);
+      const output = await runCommand(command);
+      callback(null, {output});
     });
   });
 }

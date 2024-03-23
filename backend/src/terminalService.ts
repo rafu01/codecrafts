@@ -1,35 +1,31 @@
-import {IPty, spawn} from 'node-pty';
+import { exec } from 'get-pty-output'
+import path from "path";
 
-interface Terminal {
-    pty: IPty | null,
-    socket: any
+let workingFilePath:string = '';
+export async function initiate(filePath:string): Promise<{output:string, cwd:string}> {
+    const cwd = path.join(__dirname, `../../tmp/${filePath}`);
+    workingFilePath = filePath;
+    const res = await exec(`cd ${cwd}`);
+    return {output: res.output, cwd};
 }
-
-const terminals : Record<string, Terminal> = {};
-
-export const initTerminal = async (socket: any) => {
-
-
-    // terminals[terminalId] = {
-    //     pty,
-    //     socket,
-    // };
-    //
-    // pty.onData((data) => {
-    //     console.log(data);
-    //     socket.emit('terminal', data);
-    // });
-}
-const destroyTerminal = (terminalId: string) => {
-    const terminal = terminals[terminalId];
-
-    if (!terminal) {
-        console.log('No terminal found for this socket');
-        return;
+export async function runCommand(command: string): Promise<string> {
+    const cwd = path.join(__dirname, `../../tmp/${workingFilePath}`);
+    try {
+        let out = '';
+        const timeoutPromise = new Promise<void>((resolve) => {
+            setTimeout(() => {
+                resolve();
+            }, 500);
+        });
+        // @ts-ignore
+        const { output } = await Promise.race([
+            exec(command, { cwd, timeout: 500 }),
+            timeoutPromise
+        ]);
+        out = output;
+        return out;
     }
-
-    terminal.pty?.kill();
-    delete terminals[terminalId];
-
-    console.log('Terminal destroyed');
+    catch (err) {
+        return 'Unknown Command';
+    }
 }

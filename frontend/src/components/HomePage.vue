@@ -22,7 +22,7 @@ export default {
   name: "HomePage",
   data() {
     return {
-      options: ["node-js", "python"],
+      options: ["python"],
       selectedOption: null,
       id: null
     };

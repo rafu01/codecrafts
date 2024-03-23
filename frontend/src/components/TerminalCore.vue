@@ -21,7 +21,8 @@ export default {
   data() {
     return {
       term: null,
-      pathSuffix: ''
+      pathSuffix: '',
+      inputBuffer: ''
     };
   },
   mounted() {
@@ -50,27 +51,35 @@ export default {
           this.term.write(this.pathSuffix+' >');
         }
       });
-      this.term.onData((data) => {
-        this.handleUserInput(data);
-      });
-    },
-    handleUserInput(data) {
-      const key = data.toString();
+      this.term.onKey( e => {
+        if (e.key !== '\u007f') { // Only write keys that are not backspace
+          this.term.write(e.key);
+          this.inputBuffer += e.key;
+        }
 
-      if (key === '\r') {
-        this.processInput(this.inputBuffer);
-        this.inputBuffer = '';
-      } else if (key === '\u007f') { // Backspace key
-        this.inputBuffer = this.inputBuffer.slice(0, -1);
-        this.term.write('\b \b');
-      } else if (key.match(/^[\x20-\x7e]*$/)) {
-        this.inputBuffer += key;
-        this.term.write(key);
-      }
+        if (e.key === '\r') {
+          this.processInput(this.inputBuffer);
+          this.inputBuffer = '';
+        } else if (e.key === '\u007f') {
+          this.term.write('\b \b');
+          if (this.inputBuffer) {
+            this.inputBuffer = this.inputBuffer.slice(0, -1);
+          }
+        }
+      })
     },
     processInput(input) {
-      console.log(input);
-      this.term.write(`${this.pathSuffix} >\r\n`);
+      if (input !== undefined && !input.startsWith('undefined')) {
+        this.$socket.emit('executeCommand', input, (err, outputObject) => {
+          if (err == null) {
+            let {output} = outputObject;
+            if (output==='') {
+              output = 'Invalid Command';
+            }
+            this.term.write(`\r\n${this.pathSuffix}> ${output}\r\n${this.pathSuffix}>`);
+          }
+        });
+      }
     },
   },
 };
