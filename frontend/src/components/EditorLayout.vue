@@ -1,10 +1,13 @@
 <template>
   <div>
-    <MegaMenu class="topbar" :model="topbarItems" aria-orientation="horizontal">
-      <template #item="{ item }">
-        <a :href="item.url">{{ item.label }}</a>
-      </template>
-    </MegaMenu>
+    <div class="columns">
+      <div class="column is-half">
+        <MegaMenu class="topbar" :model="topbarItems" aria-orientation="horizontal"></MegaMenu>
+      </div>
+      <div class="column is-half background-dark">
+        <Button v-if="selectedFilePath"  @click="executeCommand" label="Run" icon="pi pi-play" class="p-button-text run-button p-button-plain" />
+      </div>
+    </div>
     <div class="row">
       <div class="columns">
         <div v-if="fileTree" class="column is-2">
@@ -19,8 +22,8 @@
                         :changeThrottle="2000">
           </MonacoEditor>
         </div>
-        <div class="column is-2">
-          <TerminalComponent></TerminalComponent>
+        <div v-if="fileTree" class="column is-2">
+          <TerminalComponent :execute-file="executeFileCommand"></TerminalComponent>
         </div>
       </div>
     </div>
@@ -31,6 +34,7 @@
 
 import MonacoEditor from "vue-monaco-editor";
 import MegaMenu from 'primevue/megamenu';
+import Button from 'primevue/button';
 import FileTree from "@/components/FileTree.vue";
 import Vue from "vue";
 import axios from "axios";
@@ -42,7 +46,8 @@ export default {
     TerminalComponent,
     FileTree,
     MonacoEditor,
-    MegaMenu
+    MegaMenu,
+    Button
   },
   beforeMount() {
     const id = this.$route.query.id;
@@ -57,6 +62,7 @@ export default {
   },
   mounted() {
     const id = this.$route.query;
+    this.changeMenuItems(id);
     Vue.prototype.$socket.open();
     this.$socket.emit('init', id);
   },
@@ -76,6 +82,18 @@ export default {
           this.selectedFilePath = filePath
         }
       });
+    },
+    changeMenuItems(id) {
+      this.topbarItems[0].label = `${id['id']}`;
+    },
+    executeCommand() {
+      const file = this.selectedFilePath.split('/');
+      this.executeFileCommand = `python3 ${file[file.length-1]}`;
+      // this.$socket.emit('executeCommand', command, (err, output)=>{
+      //   if(err==null){
+      //     console.log(output);
+      //   }
+      // });
     }
   },
   data() {
@@ -85,13 +103,11 @@ export default {
       selectedFilePath: null,
       fileTree: null,
       socket: null,
+      executeFileCommand: null,
       topbarItems: [
         {
-          label: 'project title', icon: 'pi pi-fw pi-folder', url: '#'
+          label: 'project title', icon: 'pi pi-fw pi-folder'
         },
-        {
-          label: 'Run', icon: 'pi pi-play', url: 'https://google.com'
-        }
       ]
     };
   },
@@ -117,8 +133,19 @@ export default {
   padding: 0;
 }
 
+.p-megamenu {
+  padding: 15px 5px 10px 5px !important;
+  border: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
 .number {
   all: unset
+}
+.run-button {
+  padding: 25px 5px 10px 5px !important;
+}
+.background-dark {
+  background-color: #1e1e1e;
 }
 </style>
 

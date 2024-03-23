@@ -18,6 +18,17 @@ import 'xterm/css/xterm.css';
 import '../assets/xterm-custom.css';
 export default {
   name: 'TerminalComponent',
+  props: {
+    executeFile: {
+      type: String,
+      default: null
+    }
+  },
+  watch: {
+    executeFile(newCommand) {
+      this.processInput(newCommand);
+    }
+  },
   data() {
     return {
       term: null,
