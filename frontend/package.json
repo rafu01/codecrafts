@@ -11,6 +11,7 @@
     "axios": "^1.6.7",
     "bulma": "^0.9.4",
     "core-js": "^3.8.3",
+    "mitt": "^3.0.1",
     "primeicons": "^6.0.1",
     "primevue": "^2.10.4",
     "socket.io-client": "^4.7.5",

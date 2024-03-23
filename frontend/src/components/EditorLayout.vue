@@ -23,7 +23,7 @@
           </MonacoEditor>
         </div>
         <div v-if="fileTree" class="column is-2">
-          <TerminalComponent :execute-file="executeFileCommand"></TerminalComponent>
+          <TerminalComponent></TerminalComponent>
         </div>
       </div>
     </div>
@@ -39,7 +39,7 @@ import FileTree from "@/components/FileTree.vue";
 import Vue from "vue";
 import axios from "axios";
 import TerminalComponent from "@/components/TerminalCore.vue";
-
+import eventBus from '../services/eventBus';
 export default {
   name: "EditorLayout",
   components: {
@@ -89,11 +89,7 @@ export default {
     executeCommand() {
       const file = this.selectedFilePath.split('/');
       this.executeFileCommand = `python3 ${file[file.length-1]}`;
-      // this.$socket.emit('executeCommand', command, (err, output)=>{
-      //   if(err==null){
-      //     console.log(output);
-      //   }
-      // });
+      eventBus.emit('executeFileCommand', {'executeFile':this.executeFileCommand})
     }
   },
   data() {

@@ -16,19 +16,9 @@
 import { Terminal } from 'xterm';
 import 'xterm/css/xterm.css';
 import '../assets/xterm-custom.css';
+import eventBus from "@/services/eventBus";
 export default {
   name: 'TerminalComponent',
-  props: {
-    executeFile: {
-      type: String,
-      default: null
-    }
-  },
-  watch: {
-    executeFile(newCommand) {
-      this.processInput(newCommand);
-    }
-  },
   data() {
     return {
       term: null,
@@ -38,6 +28,10 @@ export default {
   },
   mounted() {
     this.initTerminal();
+    eventBus.on('executeFileCommand', (data)=> {
+      this.processInput(data['executeFile']);
+    })
+
   },
   beforeUnmount() {
     this.term.dispose();
