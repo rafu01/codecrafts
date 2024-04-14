@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: code_service
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: code_service
+  template:
+    metadata:
+      labels:
+        app: code_service
+    spec:
+      volumes:
+        - name: code-volume
+          emptyDir: { }
+      initContainers:
+        - name: cp-s3-files
+          image: amazon/aws-cli
+          command: [ "/bin/sh", "-c" ]
+          args:
+            - >
+              aws s3 cp s3://code-editor-coderepository/code/service_name/ /workspace/ --recursive &&
+              echo "Resources copied from S3";
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              value: QUtJQTNGTERZS1BTVzVDRzZRUEY=
+            - name: AWS_SECRET_ACCESS_KEY
+              value: N2EveFlKcUg0YmI5Rm1OU1RyVVFXbEJQVTJEYVBpYWEzV0w2S1YraA==
+          volumeMounts:
+            - name: workspace-volume
+              mountPath: /workspace
+      containers:
+        - name: runner
+          image: rafu01/online-code-editor:v1.0
+          ports:
+            - containerPort: 3001
+            - containerPort: 3000
+          volumeMounts:
+            - name: workspace-volume
+              mountPath: /workspace
+          resources:
+            requests:
+              cpu: "1"
+              memory: "1Gi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: code_service
+spec:
+  selector:
+    app.kubernetes.io/name: code_service
+  ports:
+    - protocol: TCP
+      port: 8081
+      targetPort: 8081
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: code_service
+spec:
+  rules:
+#    - host: www.frontend.com
+#      http:
+#        paths:
+#          - path: /
+#            pathType: Prefix
+#            backend:
+#              service:
+#                name: tea-svc
+#                port:
+#                  number: 8081
+    - host: 162.55.155.19
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: tea-svc
+                port:
+                  number: 8080

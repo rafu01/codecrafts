@@ -18,7 +18,7 @@ export function initializeSocket(httpServer: HttpServer) {
     }
   });
   io.on("connection", async (socket) => {
-    const id = socket.handshake.query.id as string;
+    // const id = socket.handshake.query.id as string;
     socket.on('init', async (idObject)=> {
       const {id} = idObject;
       await copyToLocal(`code/${id}`, path.join(__dirname, `../../tmp/${id}`));
@@ -45,9 +45,6 @@ export function initializeSocket(httpServer: HttpServer) {
       const {id} = idObject;
       const {output, cwd} = await initiate(id);
       callback(null, {data: output, cwd});
-      // terminalManager.createPty(socket.id, id, (data: any, cwd: string, terminalId: any) => {
-      //   callback(null, {data: Buffer.from(data,"utf-8"), cwd});
-      // });
     });
 
     socket.on('disconnect', () => {
