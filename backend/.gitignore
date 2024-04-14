@@ -46,7 +46,7 @@ jspm_packages/
 *.tgz
 
 # dotenv environment variables file
-.env.production
 .env
+.env.dev
 
 package-lock.json
