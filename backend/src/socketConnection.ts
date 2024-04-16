@@ -1,14 +1,9 @@
 import { Server as SocketServer, Socket } from "socket.io";
 import { Server as HttpServer } from "http";
 import {getFileContents, copyToLocal, writeToFile} from "./s3Service";
-import path from "path";
 import * as dotenv from "dotenv";
-// @ts-ignore
-import {TerminalManager} from "./terminalManager";
 import {initiate, runCommand} from "./terminalService";
 dotenv.config();
-
-const terminalManager = new TerminalManager();
 
 export function initializeSocket(httpServer: HttpServer) {
   const io = new SocketServer(httpServer, {
@@ -19,10 +14,12 @@ export function initializeSocket(httpServer: HttpServer) {
   });
   io.on("connection", async (socket) => {
     // const id = socket.handshake.query.id as string;
-    socket.on('init', async (idObject)=> {
-      const {id} = idObject;
-      await copyToLocal(`code/${id}`, path.join(__dirname, `../../tmp/${id}`));
-    })
+    // socket.on('init', async (idObject)=> {
+    //   const {id} = idObject;
+    //   let res = await createKubernetes(id);
+    //   console.log(res);
+    //   // await copyToLocal(`code/${id}`, path.join(__dirname, `../../tmp/${id}`));
+    // })
     socket.on('fetchFileContent', async (filePath, callback) => {
       try {
         let fileContent = await getFileContents(filePath);

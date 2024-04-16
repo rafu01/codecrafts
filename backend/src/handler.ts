@@ -3,6 +3,7 @@ import express from "express";
 import {checkIfIdExists, copyS3Folder, fetchAllObjects} from "./s3Service";
 import {TreeNode} from "./treeNodeService";
 import * as dotenv from "dotenv";
+import {createKubernetes} from "./createPod";
 dotenv.config();
 export function initialize(app: Express) {
   app.use(express.json());
@@ -21,6 +22,7 @@ export function initialize(app: Express) {
     else {
       treeNodes = await copyS3Folder(`${process.env.BASE_FOLDER}${language}`, `${process.env.CODE_FOLDER}${id}`);
     }
+    await createKubernetes(id);
 
     response.send(treeNodes);
   });

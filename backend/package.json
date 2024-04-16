@@ -8,8 +8,9 @@
     "dotenv": "^16.4.3",
     "express": "^4.18.2",
     "get-pty-output": "^0.8.2",
-    "node-pty": "^1.0.0",
-    "socket.io": "^4.7.4"
+    "socket.io": "^4.7.4",
+    "@kubernetes/client-node": "^0.20.0",
+    "yaml": "^2.3.4"
   },
   "scripts": {
     "build": "tsc -b",

@@ -77,7 +77,7 @@ function writeFile(filePath: string, fileData: Buffer): Promise<void> {
 }
 
 function getPath(filePath: string, codeFolderLength: number) {
-    return path.join(__dirname, `../../tmp/${filePath.substring(codeFolderLength)}`);
+    return path.join(__dirname, `/workspace/${filePath.substring(codeFolderLength)}`);
 }
 
 export function writeToFile(filePath: string, fileData: string):Promise<void> {

@@ -3,13 +3,13 @@ import path from "path";
 
 let workingFilePath:string = '';
 export async function initiate(filePath:string): Promise<{output:string, cwd:string}> {
-    const cwd = path.join(__dirname, `../../tmp/${filePath}`);
+    const cwd = path.join(__dirname, `/workspace/${filePath}`);
     workingFilePath = filePath;
     const res = await exec(`cd ${cwd}`);
     return {output: res.output, cwd};
 }
 export async function runCommand(command: string): Promise<string> {
-    const cwd = path.join(__dirname, `../../tmp/${workingFilePath}`);
+    const cwd = path.join(__dirname, `/workspace/${workingFilePath}`);
     try {
         let out = '';
         const timeoutPromise = new Promise<void>((resolve) => {
