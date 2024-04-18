@@ -61,10 +61,12 @@ export default {
         });
   },
   mounted() {
-    const id = this.$route.query;
-    this.changeMenuItems(id);
+    const idObject = this.$route.query;
+    this.changeMenuItems(idObject);
+    const socketUrl = `${idObject['id']}.${process.env.VUE_APP_WS}`;
+    this.$socket.io.opts.path = socketUrl;
     Vue.prototype.$socket.open();
-    this.$socket.emit('init', id);
+    console.log("connection opened");
   },
   methods: {
     onMounted(editor) {
@@ -80,6 +82,7 @@ export default {
         if(err==null) {
           this.editor.setValue(fileContent);
           this.selectedFilePath = filePath
+          console.log("fetched file content");
         }
       });
     },

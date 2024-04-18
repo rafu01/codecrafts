@@ -9,7 +9,7 @@ import { SocketPlugin } from './socket';
 
 Vue.use(PrimeVue);
 Vue.use(SocketPlugin, {
-    url: process.env.VUE_APP_WS,
+    // url: process.env.VUE_APP_WS,
 });
 new Vue({
     router,
