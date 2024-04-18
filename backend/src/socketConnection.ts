@@ -9,7 +9,7 @@ export function initializeSocket(httpServer: HttpServer) {
   const io = new SocketServer(httpServer, {
     cors: {
       origin: '*',
-      methods: ['GET', 'POST']
+      methods: ['GET', 'POST', 'WS']
     }
   });
   io.on("connection", async (socket) => {
@@ -20,7 +20,9 @@ export function initializeSocket(httpServer: HttpServer) {
     //   console.log(res);
     //   // await copyToLocal(`code/${id}`, path.join(__dirname, `../../tmp/${id}`));
     // })
+    console.log("connection reached to backend");
     socket.on('fetchFileContent', async (filePath, callback) => {
+      console.log("connection fetch file content")
       try {
         let fileContent = await getFileContents(filePath);
         callback(null, fileContent);

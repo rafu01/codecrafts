@@ -8,7 +8,7 @@ import {initializeSocket} from "./socketConnection";
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors({ origin: 'http://localhost:8082' }));
 const server = createServer(app);
 initializeSocket(server);
 initialize(app);
