@@ -13,16 +13,8 @@ export function initializeSocket(httpServer: HttpServer) {
     }
   });
   io.on("connection", async (socket) => {
-    // const id = socket.handshake.query.id as string;
-    // socket.on('init', async (idObject)=> {
-    //   const {id} = idObject;
-    //   let res = await createKubernetes(id);
-    //   console.log(res);
-    //   // await copyToLocal(`code/${id}`, path.join(__dirname, `../../tmp/${id}`));
-    // })
     console.log("connection reached to backend");
     socket.on('fetchFileContent', async (filePath, callback) => {
-      console.log("connection fetch file content")
       try {
         let fileContent = await getFileContents(filePath);
         callback(null, fileContent);

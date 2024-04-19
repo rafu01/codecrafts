@@ -77,7 +77,7 @@ function writeFile(filePath: string, fileData: Buffer): Promise<void> {
 }
 
 function getPath(filePath: string, codeFolderLength: number) {
-    return path.join(__dirname, `/workspace/${filePath.substring(codeFolderLength)}`);
+    return path.join(`/workspace', ${filePath.substring(codeFolderLength)}`);
 }
 
 export function writeToFile(filePath: string, fileData: string):Promise<void> {
@@ -145,9 +145,11 @@ export const copyToLocal = async (key: string, path: string) => {
 
 export const getFileContents = async (filePath: string): Promise<string> => {
     return new Promise<string>((resolve, reject) => {
+        console.log(filePath)
         let codeFolderLength = `${process.env.CODE_FOLDER}`.length;
         fs.readFile(getPath(filePath, codeFolderLength), 'utf-8',  (err, data) => {
             if (err) {
+                console.log(err);
                 reject(err);
             } else {
                 resolve(data);
