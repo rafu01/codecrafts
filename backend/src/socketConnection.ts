@@ -3,12 +3,8 @@ import { Server as HttpServer } from "http";
 import {getFileContents, copyToLocal, writeToFile} from "./s3Service";
 import path from "path";
 import * as dotenv from "dotenv";
-// @ts-ignore
-import {TerminalManager} from "./terminalManager";
 import {initiate, runCommand} from "./terminalService";
 dotenv.config();
-
-const terminalManager = new TerminalManager();
 
 export function initializeSocket(httpServer: HttpServer) {
   const io = new SocketServer(httpServer, {

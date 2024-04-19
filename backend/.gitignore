@@ -49,5 +49,6 @@ jspm_packages/
 # dotenv environment variables file
 .env.production
 
-
+service.yaml
 package-lock.json
+.env

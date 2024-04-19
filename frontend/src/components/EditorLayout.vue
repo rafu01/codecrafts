@@ -40,6 +40,7 @@ import Vue from "vue";
 import axios from "axios";
 import TerminalComponent from "@/components/TerminalCore.vue";
 import eventBus from '../services/eventBus';
+import { SocketPlugin } from '@/socket';
 export default {
   name: "EditorLayout",
   components: {
@@ -63,6 +64,10 @@ export default {
   mounted() {
     const id = this.$route.query;
     this.changeMenuItems(id);
+    const path = `http://${id['id']}.localhost:8080`;
+    Vue.use(SocketPlugin, {
+      url: path
+    });
     Vue.prototype.$socket.open();
     this.$socket.emit('init', id);
   },

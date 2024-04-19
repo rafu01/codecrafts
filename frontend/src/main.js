@@ -5,12 +5,9 @@ import PrimeVue from 'primevue/config';
 import 'primevue/resources/themes/arya-blue/theme.css';
 import 'primevue/resources/primevue.min.css';
 import 'primeicons/primeicons.css';
-import { SocketPlugin } from './socket';
 
 Vue.use(PrimeVue);
-Vue.use(SocketPlugin, {
-    url: process.env.VUE_APP_BACKEND,
-});
+
 new Vue({
     router,
     render: h => h(App),
