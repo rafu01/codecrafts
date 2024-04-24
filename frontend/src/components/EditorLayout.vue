@@ -1,29 +1,34 @@
 <template>
   <div>
-    <div class="columns">
-      <div class="column is-half">
-        <MegaMenu class="topbar" :model="topbarItems" aria-orientation="horizontal"></MegaMenu>
-      </div>
-      <div class="column is-half background-dark">
-        <Button v-if="selectedFilePath"  @click="executeCommand" label="Run" icon="pi pi-play" class="p-button-text run-button p-button-plain" />
-      </div>
+    <div v-if="!podCreated">
+      Loading...
     </div>
-    <div class="row">
+    <div v-if="podCreated">
       <div class="columns">
-        <div v-if="fileTree" class="column is-2">
-          <FileTree :file-tree="fileTree" @file-selected="fetchFileContent"></FileTree>
+        <div class="column is-half">
+          <MegaMenu class="topbar" :model="topbarItems" aria-orientation="horizontal"></MegaMenu>
         </div>
-        <div class="column is-8">
-          <MonacoEditor height="645"
-                        :language="language"
-                        :code="code"
-                        @mounted="onMounted"
-                        @codeChange="onCodeChange"
-                        :changeThrottle="2000">
-          </MonacoEditor>
+        <div class="column is-half background-dark">
+          <Button v-if="selectedFilePath"  @click="executeCommand" label="Run" icon="pi pi-play" class="p-button-text run-button p-button-plain" />
         </div>
-        <div v-if="fileTree" class="column is-2">
-          <TerminalComponent></TerminalComponent>
+      </div>
+      <div class="row">
+        <div class="columns">
+          <div v-if="fileTree" class="column is-2">
+            <FileTree :file-tree="fileTree" @file-selected="fetchFileContent"></FileTree>
+          </div>
+          <div class="column is-8">
+            <MonacoEditor height="645"
+                          :language="language"
+                          :code="code"
+                          @mounted="onMounted"
+                          @codeChange="onCodeChange"
+                          :changeThrottle="2000">
+            </MonacoEditor>
+          </div>
+          <div v-if="fileTree" class="column is-2">
+            <TerminalComponent></TerminalComponent>
+          </div>
         </div>
       </div>
     </div>
@@ -40,6 +45,7 @@ import Vue from "vue";
 import axios from "axios";
 import TerminalComponent from "@/components/TerminalCore.vue";
 import eventBus from '../services/eventBus';
+import {SocketPlugin} from "@/socket";
 export default {
   name: "EditorLayout",
   components: {
@@ -55,18 +61,20 @@ export default {
     axios.post(`${process.env.VUE_APP_BACKEND}/project`, {id, language})
         .then(response => {
           this.fileTree = response.data;
+          this.podCreated = true;
+          const idObject = this.$route.query;
+          this.changeMenuItems(idObject);
+          const socketUrl = `ws://${idObject['id']}.${process.env.VUE_APP_WS}`;
+          console.log(socketUrl);
+          Vue.use(SocketPlugin, {
+            url: socketUrl
+          });
+          Vue.prototype.$socket.open();
+          console.log("connection opened");
         })
         .catch(error => {
           console.error("Error:", error);
         });
-  },
-  mounted() {
-    const idObject = this.$route.query;
-    this.changeMenuItems(idObject);
-    const socketUrl = `${idObject['id']}.${process.env.VUE_APP_WS}`;
-    this.$socket.io.opts.path = socketUrl;
-    Vue.prototype.$socket.open();
-    console.log("connection opened");
   },
   methods: {
     onMounted(editor) {
@@ -78,6 +86,7 @@ export default {
       });
     },
     fetchFileContent(filePath) {
+      console.log("filepath", filePath);
       this.$socket.emit('fetchFileContent', filePath, (err, fileContent) => {
         if(err==null) {
           this.editor.setValue(fileContent);
@@ -98,6 +107,7 @@ export default {
   data() {
     return {
       code: "#start your code here",
+      podCreated: false,
       language: "python",
       selectedFilePath: null,
       fileTree: null,

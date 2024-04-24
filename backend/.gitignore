@@ -51,3 +51,4 @@ jspm_packages/
 
 service.yaml
 package-lock.json
+src/editorService/src/.env

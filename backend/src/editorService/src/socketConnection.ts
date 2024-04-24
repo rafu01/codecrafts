@@ -1,6 +1,6 @@
-import { Server as SocketServer, Socket } from "socket.io";
+import { Server as SocketServer } from "socket.io";
 import { Server as HttpServer } from "http";
-import {getFileContents, copyToLocal, writeToFile} from "./s3Service";
+import {getFileContents, writeToFile} from "./s3Service";
 import * as dotenv from "dotenv";
 import {initiate, runCommand} from "./terminalService";
 dotenv.config();

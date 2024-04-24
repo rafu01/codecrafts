@@ -49,6 +49,7 @@ export default {
       this.term.open(this.$refs.terminalContainer);
       const id = this.$route.query;
       this.$socket.emit('requestTerminal', id, (err, dataObj)=>{
+        console.log("terminal", id);
         if(err==null) {
           const {cwd} = dataObj;
           const pathArr = cwd.split('/');
