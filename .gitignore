@@ -1,5 +1,8 @@
 package-lock.json
 .idea/
-.samplecodes/
+samplecodes/*
 .run/
 tmp/*
+screenshots/*
+readme.md
+scripts.sh
