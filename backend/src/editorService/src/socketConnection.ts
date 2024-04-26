@@ -2,7 +2,7 @@ import { Server as SocketServer } from "socket.io";
 import { Server as HttpServer } from "http";
 import {getFileContents, writeToFile} from "./s3Service";
 import * as dotenv from "dotenv";
-import {initiate, runCommand} from "./terminalService";
+import {executeFile, initiate, runCommand} from "./terminalService";
 dotenv.config();
 
 export function initializeSocket(httpServer: HttpServer) {
@@ -42,10 +42,15 @@ export function initializeSocket(httpServer: HttpServer) {
       console.log('a user disconnected');
     });
 
+    socket.on('executeFile', async (fileName, callback) => {
+      console.log('executing file: ', fileName);
+      const {output, cwd} = await executeFile(fileName);
+      callback(null, {output, cwd});
+    });
+
     socket.on("executeCommand", async (command, callback) => {
-      console.log('command: ', command);
-      const output = await runCommand(command);
-      callback(null, {output});
+      const {output, cwd} = await runCommand(command);
+      callback(null, {output, cwd});
     });
   });
 }

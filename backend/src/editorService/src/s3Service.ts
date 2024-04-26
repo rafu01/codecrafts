@@ -105,7 +105,6 @@ export const copyToLocal = async (key: string, path: string) => {
 
 export const getFileContents = async (filePath: string): Promise<string> => {
     return new Promise<string>((resolve, reject) => {
-        console.log(filePath)
         let codeFolderLength = `${process.env.CODE_FOLDER}`.length;
         fs.readFile(filePath, 'utf-8',  (err, data) => {
             if (err) {

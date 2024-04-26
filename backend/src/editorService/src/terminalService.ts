@@ -1,33 +1,33 @@
-import { exec } from 'get-pty-output'
-import path from "path";
+import shell from 'shelljs';
 
-let workingFilePath:string = '';
-export async function initiate(filePath:string): Promise<{output:string, cwd:string}> {
+let workingFilePath: string = '';
+
+export async function initiate(filePath: string): Promise<{ output: string, cwd: string }> {
     const cwd = `/workspace/${filePath}`;
-    console.log(cwd);
     workingFilePath = filePath;
-    const res = await exec(`cd ${cwd}`);
-    return {output: res.output, cwd};
+    const {output} = await executeCommand(`cd ${cwd}`);
+    return {output, cwd};
 }
-export async function runCommand(command: string): Promise<string> {
+
+export async function executeFile(fileName: string): Promise<{ output: string, cwd: string }> {
     const cwd = `/workspace/${workingFilePath}`;
-    console.log(cwd);
-    try {
-        let out = '';
-        const timeoutPromise = new Promise<void>((resolve) => {
-            setTimeout(() => {
-                resolve();
-            }, 500);
-        });
-        // @ts-ignore
-        const { output } = await Promise.race([
-            exec(command, { cwd, timeout: 500 }),
-            timeoutPromise
-        ]);
-        out = output;
-        return out;
+    const command = `python3 ${fileName}`;
+    const commands: string[] = [`cd ${cwd}`, command];
+    return await runCommand(commands.join(' && '));
+}
+
+export async function runCommand(command: string): Promise<{ output: string, cwd: string }> {
+    return await executeCommand(command);
+}
+
+
+async function executeCommand(command: string): Promise<{ output: string, cwd: string }> {
+    const {stdout, stderr, code} = shell.exec(command, {silent: true});
+    const cwd = shell.exec('pwd', {silent: true});
+    if (code !== 0) {
+        console.log(stderr);
+        return {output: 'Command not allowed', cwd};
     }
-    catch (err) {
-        return 'Unknown Command';
-    }
+    const output = stdout.trim().split('\n').join(' ');
+    return {output, cwd};
 }

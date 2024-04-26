@@ -14,7 +14,7 @@
       </div>
       <div class="row">
         <div class="columns">
-          <div v-if="fileTree" class="column is-2">
+          <div v-if="fileTree && podCreated" class="column is-2">
             <FileTree :file-tree="fileTree" @file-selected="fetchFileContent"></FileTree>
           </div>
           <div class="column is-8">
@@ -26,7 +26,7 @@
                           :changeThrottle="2000">
             </MonacoEditor>
           </div>
-          <div v-if="fileTree" class="column is-2">
+          <div v-if="fileTree && podCreated" class="column is-2">
             <TerminalComponent></TerminalComponent>
           </div>
         </div>
@@ -100,8 +100,8 @@ export default {
     },
     executeCommand() {
       const file = this.selectedFilePath.split('/');
-      this.executeFileCommand = `python3 ${file[file.length-1]}`;
-      eventBus.emit('executeFileCommand', {'executeFile':this.executeFileCommand})
+      this.fileName = `${file[file.length-1]}`;
+      eventBus.emit('executeFileCommand', {'executeFile':this.fileName})
     }
   },
   data() {

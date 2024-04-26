@@ -1,11 +1,6 @@
 <template>
   <div class="terminal-container">
     <div class="terminal-header">
-<!--      <div class="terminal-buttons">-->
-<!--        <span class="terminal-button"></span>-->
-<!--        <span class="terminal-button"></span>-->
-<!--        <span class="terminal-button"></span>-->
-<!--      </div>-->
       <div class="terminal-title">Terminal</div>
     </div>
     <div ref="terminalContainer" class="terminal-view"></div>
@@ -14,6 +9,7 @@
 
 <script>
 import { Terminal } from 'xterm';
+import { FitAddon } from 'xterm-addon-fit';
 import 'xterm/css/xterm.css';
 import '../assets/xterm-custom.css';
 import eventBus from "@/services/eventBus";
@@ -29,7 +25,7 @@ export default {
   mounted() {
     this.initTerminal();
     eventBus.on('executeFileCommand', (data)=> {
-      this.processInput(data['executeFile']);
+      this.executeCurrentFile(data['executeFile']);
     })
 
   },
@@ -43,10 +39,19 @@ export default {
           background: '#282c34',
           foreground: '#abb2bf',
         },
+        rendererType: 'canvas',
         rows: 24,
         cols: 80,
       });
+      const fitAddon = new FitAddon();
+      this.term.loadAddon(fitAddon);
       this.term.open(this.$refs.terminalContainer);
+      fitAddon.fit();
+
+      window.addEventListener('resize', () => {
+        fitAddon.fit();
+      });
+
       const id = this.$route.query;
       this.$socket.emit('requestTerminal', id, (err, dataObj)=>{
         console.log("terminal", id);
@@ -74,15 +79,32 @@ export default {
         }
       })
     },
-    processInput(input) {
-      if (input !== undefined && !input.startsWith('undefined')) {
-        this.$socket.emit('executeCommand', input, (err, outputObject) => {
+    executeCurrentFile(fileName) {
+      if (fileName !== undefined && !fileName.startsWith('undefined')) {
+        this.$socket.emit('executeFile', fileName, (err, outputObject) => {
           if (err == null) {
-            let {output} = outputObject;
+            let {output, cwd} = outputObject;
             if (output==='') {
               output = 'Invalid Command';
             }
-            this.term.write(`\r\n${this.pathSuffix}> ${output}\r\n${this.pathSuffix}>`);
+            this.pathSuffix = cwd;
+            this.term.write(`\r\n${cwd.slice(0,-1)}> ${output}\r\n${cwd.slice(0,-1)}>`);
+          }
+        });
+      }
+    },
+    processInput(input) {
+      if (input !== undefined && !input.startsWith('undefined')) {
+        input = input.slice(0,-1);
+        this.$socket.emit('executeCommand', input, (err, outputObject) => {
+          if (err == null) {
+            let {output, cwd} = outputObject;
+            // if (output==='') {
+            //   output = 'Invalid Command';
+            // }
+            this.pathSuffix = cwd;
+            cwd = cwd.endsWith('\n') ? cwd.slice(0,-1):cwd;
+            this.term.write(`\r\n${cwd}> ${output}\r\n${cwd}>`);
           }
         });
       }
@@ -90,3 +112,4 @@ export default {
   },
 };
 </script>
+
