@@ -1,13 +1,17 @@
-FROM node:20
+FROM node:20-alpine
 
-WORKDIR /app
+WORKDIR /
 
-COPY package*.json .
+COPY package*.json ./
 
-RUN npm ci --only=production
+RUN npm install
 
 COPY . .
 
+COPY config ./
+
+RUN npm run build
+
 EXPOSE 8080
 
-CMD [ "node", "index.js" ]
+CMD [ "node", "dist/handler.js" ]

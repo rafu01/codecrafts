@@ -1,13 +1,11 @@
-version: '3.8'
-
+version: '3'
 services:
-  localstack:
-    image: localstack/localstack
-    container_name: localstack-private
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "4566-4599:4566-4599"
+      - "8080:8080"
     environment:
-      - SERVICES=s3
-      - DEFAULT_REGION=ap-south-1
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
+      - KUBECONFIG=config
+    restart: unless-stopped

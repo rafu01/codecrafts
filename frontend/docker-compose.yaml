@@ -3,12 +3,8 @@ services:
   online-code-editor-frontend:
     build:
       context: .
-      dockerfile: frontend/Dockerfile
+      dockerfile: Dockerfile
     restart: unless-stopped
     container_name: online-code-editor-frontend
     ports:
-       - "8082:8082"
-networks:
-  default:
-    external:
-      name: nginx-proxy
+      - "8082:80"
