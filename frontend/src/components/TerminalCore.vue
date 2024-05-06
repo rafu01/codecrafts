@@ -54,7 +54,6 @@ export default {
 
       const id = this.$route.query;
       this.$socket.emit('requestTerminal', id, (err, dataObj)=>{
-        console.log("terminal", id);
         if(err==null) {
           const {cwd} = dataObj;
           const pathArr = cwd.split('/');
@@ -63,7 +62,7 @@ export default {
         }
       });
       this.term.onKey( e => {
-        if (e.key !== '\u007f') { // Only write keys that are not backspace
+        if (e.key !== '\u007f') {
           this.term.write(e.key);
           this.inputBuffer += e.key;
         }
@@ -99,9 +98,6 @@ export default {
         this.$socket.emit('executeCommand', input, (err, outputObject) => {
           if (err == null) {
             let {output, cwd} = outputObject;
-            // if (output==='') {
-            //   output = 'Invalid Command';
-            // }
             this.pathSuffix = cwd;
             cwd = cwd.endsWith('\n') ? cwd.slice(0,-1):cwd;
             this.term.write(`\r\n${cwd}> ${output}\r\n${cwd}>`);

@@ -65,12 +65,10 @@ export default {
           const idObject = this.$route.query;
           this.changeMenuItems(idObject);
           const socketUrl = `https://${idObject['id']}.${process.env.VUE_APP_WS}`;
-          console.log(socketUrl);
           Vue.use(SocketPlugin, {
             url: socketUrl
           });
           Vue.prototype.$socket.open();
-          console.log("connection opened");
         })
         .catch(error => {
           console.error("Error:", error);
@@ -82,7 +80,9 @@ export default {
     },
     onCodeChange() {
       this.$socket.emit('saveChange', this.editor.getValue(), this.selectedFilePath, (err, saved) => {
-        console.log('changes ', saved);
+        if(err!=null) {
+          console.log("Saving failed", err);
+        }
       });
     },
     fetchFileContent(filePath) {
@@ -91,7 +91,6 @@ export default {
         if(err==null) {
           this.editor.setValue(fileContent);
           this.selectedFilePath = filePath
-          console.log("fetched file content");
         }
       });
     },
