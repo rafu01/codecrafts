@@ -64,7 +64,7 @@ export default {
           this.podCreated = true;
           const idObject = this.$route.query;
           this.changeMenuItems(idObject);
-          const socketUrl = `ws://${idObject['id']}.${process.env.VUE_APP_WS}`;
+          const socketUrl = `https://${idObject['id']}.${process.env.VUE_APP_WS}`;
           console.log(socketUrl);
           Vue.use(SocketPlugin, {
             url: socketUrl
