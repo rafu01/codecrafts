@@ -42,7 +42,7 @@ export default {
 };
 </script>
 <style>
-.p-tree-container {
-  height: 566px !important;
+.p-tree {
+  border: none !important;
 }
 </style>

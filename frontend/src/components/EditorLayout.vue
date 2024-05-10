@@ -9,24 +9,24 @@
           <MegaMenu class="topbar" :model="topbarItems" aria-orientation="horizontal"></MegaMenu>
         </div>
         <div class="column is-half background-dark">
-          <Button v-if="selectedFilePath"  @click="executeCommand" label="Run" icon="pi pi-play" class="p-button-text run-button p-button-plain" />
+          <Button v-if="selectedFilePath" @click="executeCommand" label="Run" icon="pi pi-play"
+                  class="p-button-text run-button p-button-plain"/>
         </div>
       </div>
       <div class="row">
-        <div class="columns">
-          <div v-if="fileTree && podCreated" class="column is-2">
+        <div class="columns bg-card">
+          <div v-if="fileTree && podCreated" class="column is-2 card primary-bg is-fullheight">
             <FileTree :file-tree="fileTree" @file-selected="fetchFileContent"></FileTree>
           </div>
           <div class="column is-8">
-            <MonacoEditor height="645"
-                          :language="language"
+            <MonacoEditor :language="language"
                           :code="code"
                           @mounted="onMounted"
                           @codeChange="onCodeChange"
                           :changeThrottle="2000">
             </MonacoEditor>
           </div>
-          <div v-if="fileTree && podCreated" class="column is-2">
+          <div v-if="fileTree && podCreated" class="column is-2 card primary-bg is-fullheight">
             <TerminalComponent></TerminalComponent>
           </div>
         </div>
@@ -46,6 +46,7 @@ import axios from "axios";
 import TerminalComponent from "@/components/TerminalCore.vue";
 import eventBus from '../services/eventBus';
 import {SocketPlugin} from "@/socket";
+
 export default {
   name: "EditorLayout",
   components: {
@@ -80,15 +81,15 @@ export default {
     },
     onCodeChange() {
       this.$socket.emit('saveChange', this.editor.getValue(), this.selectedFilePath, (err, saved) => {
-        if(err!=null) {
-          console.log("Saving failed", err);
+        if (err != null || !saved) {
+          console.log("Saving failed", err, saved);
         }
       });
     },
     fetchFileContent(filePath) {
       console.log("filepath", filePath);
       this.$socket.emit('fetchFileContent', filePath, (err, fileContent) => {
-        if(err==null) {
+        if (err == null) {
           this.editor.setValue(fileContent);
           this.selectedFilePath = filePath
         }
@@ -99,8 +100,8 @@ export default {
     },
     executeCommand() {
       const file = this.selectedFilePath.split('/');
-      this.fileName = `${file[file.length-1]}`;
-      eventBus.emit('executeFileCommand', {'executeFile':this.fileName})
+      this.fileName = `${file[file.length - 1]}`;
+      eventBus.emit('executeFileCommand', {'executeFile': this.fileName})
     }
   },
   data() {
@@ -136,21 +137,28 @@ export default {
     background-color: #d0cfcf;
   }
 }
-
+.primary-bg {
+  background-color: #1e1e1e !important;
+  border: 1px solid #383838;
+}
 .column {
   padding: 0;
 }
-
 .p-megamenu {
   padding: 15px 5px 10px 5px !important;
   border: 0 !important;
   border-bottom-right-radius: 0 !important;
 }
+
 .number {
   all: unset
 }
+
 .run-button {
   padding: 25px 5px 10px 5px !important;
+}
+.bg-card {
+  height: 100vh !important;
 }
 .background-dark {
   background-color: #1e1e1e;
@@ -163,9 +171,11 @@ export default {
     cursor: pointer;
   }
 }
+
 .topbar {
   padding: 0 0 10px 0;
 }
+
 .muted {
   color: gray;
   font-size: 80%;

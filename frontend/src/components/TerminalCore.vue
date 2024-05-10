@@ -36,7 +36,7 @@ export default {
     initTerminal() {
       this.term = new Terminal({
         theme: {
-          background: '#282c34',
+          background: '#1e1e1e',
           foreground: '#abb2bf',
         },
         rendererType: 'canvas',

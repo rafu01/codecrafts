@@ -1,5 +1,5 @@
 .terminal-container {
-    background-color: #282c34;
+    background-color: #1e1e1e;
     color: #abb2bf;
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -11,7 +11,7 @@
     display: flex;
     align-items: center;
     padding: 8px;
-    background-color: #21252b;
+    background-color: #212121;
 }
 
 .terminal-buttons {
@@ -46,6 +46,6 @@
 
 .terminal-view {
     padding: 8px;
-    height: 609px;
+    height: 95vh;
     overflow: auto;
 }
