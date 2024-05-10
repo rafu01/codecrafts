@@ -1,7 +1,9 @@
 <template>
   <div>
-    <div v-if="!podCreated">
-      Loading...
+    <div v-if="!podCreated" class="container">
+      <div class="columns is-centered margin">
+        <ProgressSpinner />
+      </div>
     </div>
     <div v-if="podCreated">
       <div class="columns">
@@ -46,6 +48,7 @@ import axios from "axios";
 import TerminalComponent from "@/components/TerminalCore.vue";
 import eventBus from '../services/eventBus';
 import {SocketPlugin} from "@/socket";
+import ProgressSpinner from 'primevue/progressspinner';
 
 export default {
   name: "EditorLayout",
@@ -54,7 +57,8 @@ export default {
     FileTree,
     MonacoEditor,
     MegaMenu,
-    Button
+    Button,
+    ProgressSpinner
   },
   beforeMount() {
     const id = this.$route.query.id;
@@ -179,5 +183,24 @@ export default {
 .muted {
   color: gray;
   font-size: 80%;
+}
+@keyframes p-progress-spinner-color {
+  100%,
+  0% {
+    stroke: #676767;
+  }
+  40% {
+    stroke: #4b4b4b;
+  }
+  66% {
+    stroke: #333333;
+  }
+  80%,
+  90% {
+    stroke: #1e1e1e;
+  }
+}
+.margin {
+  margin: 3rem;
 }
 </style>
